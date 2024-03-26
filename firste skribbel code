@@ -1,0 +1,110 @@
+import turtle
+import time
+#screen adjustment
+screen = turtle.Screen()
+screen.setup(1920,1080)
+screen.title("Paint")
+
+#setting turtle
+pen = turtle.Turtle()
+pen.shape("circle")
+pen.speed(0)
+key_pressed = False
+cur_x, cur_y = 0,0
+up = True
+
+#setting the colors
+red = turtle.Turtle()
+red.speed(0)
+red.hideturtle()
+orange = red.clone()
+yellow = red.clone()
+green = red.clone()
+blue = red.clone()
+purple = red.clone()
+pink = red.clone()
+black = red.clone()
+brown = red.clone()
+
+#list of colors
+list_col = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "black", "brown"]
+list_var = [red, orange, yellow, green, blue, purple, pink, black, brown]
+
+#set block of color
+block = turtle.Turtle()
+block.hideturtle()
+block.shape("square")
+block.shapesize(2)
+block.penup()
+block.speed(0)
+
+#place all the blocks on top right of screen
+def colors():
+    y1, y2 = 550, 550
+    for i in range(9):
+        list_var[i] = block.clone()
+        list_var[i].color(list_col[i])
+        list_var[i].goto(y1,450)
+        y1 = y1 - 40
+        list_var[i].showturtle()
+colors()
+
+#function for change color on click
+def select_color(x,y):
+    for v in range(9):
+        if x >= list_var[v].xcor() - 20 and x <= list_var[v].xcor() + 20 and y <=  list_var[v].ycor() + 20 and y >=  list_var[v].ycor() - 20:
+            pen.color(list_col[v])
+
+def decrease_pen_size():
+  global pen_size
+  pen_size -= 1
+  print(pen_size)
+  pen.pensize(pen_size)
+
+def increase_pen_size():
+  global pen_size
+  pen_size += 1
+  print(pen_size)
+  pen.pensize(pen_size)
+
+
+def drag(x, y):
+    up = False
+    pen.ondrag(None)  # Disable event handling to prevent recursive calling
+    pen.setheading(pen.towards(x,y))
+    pen.pendown()
+    pen.goto(x,y)
+    pen.ondrag(drag)
+    up = True
+
+
+def Eraser(x, y):
+    pen.pensize(13)
+    pen.color("white")# Change color to white when right-clicked
+
+def move_pen(x, y, height):
+    pen.penup() if height == "up" else pen.pendown()
+    pen.setposition(x, y)    
+
+#clear
+def clear(x,y):
+    pen.clear()
+
+
+
+#calls for funcs
+screen.listen()
+screen.onkeypress(increase_pen_size, "Up")  # Increase pen size with "up" arrow
+screen.onkeypress(decrease_pen_size, "Down")  # Decrease pen size with "down" arrow
+screen.onclick(select_color, btn=1) # When click on block of color, changes color of pen to the block color
+screen.onclick(clear, btn=2) # When click on wheel, clear  
+screen.onclick(Eraser, btn=3)
+pen.ondrag(drag)
+canvas = turtle.getcanvas()
+print()
+while True:
+    cur_x, cur_y = canvas.winfo_pointerx(), canvas.winfo_pointery()
+    move_pen(cur_x - canvas.winfo_screenwidth()/2 - 3, -cur_y + canvas.winfo_screenheight()/2 - 5 ,"up") if up == True else move_pen(cur_x - canvas.winfo_screenwidth()/2, -cur_y + canvas.winfo_screenheight()/2 - 20,"down")
+
+
+screen.mainloop()
